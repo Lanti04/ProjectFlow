@@ -2,7 +2,10 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import authRoutes from './routes/authRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js'
 import { Pool } from "pg";
+import { pool } from "./db.js";
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -23,14 +26,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
+
+app.use('/api', dashboardRoutes);
+
 // PostgreSQL Connection Pool
-const pool = new Pool({
+/* const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
+*/
 
 // Test DB Connection
 pool
