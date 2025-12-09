@@ -1,5 +1,9 @@
+// ========== AUTHENTICATION MIDDLEWARE ==========
+// Protects routes by verifying JWT tokens from Authorization header
 import jwt from 'jsonwebtoken';
 
+// ========== PROTECT MIDDLEWARE ==========
+// Extracts & validates JWT token, attaches userId to request
 export const protect = async (req, res, next) => {
     let token;
 

@@ -1,3 +1,5 @@
+// ========== DATABASE CONNECTION POOL ==========
+// PostgreSQL connection pool configuration (reused across all routes)
 import { Pool } from "pg";
 import dotenv from "dotenv";
 

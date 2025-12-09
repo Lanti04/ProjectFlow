@@ -1,3 +1,5 @@
+// ========== NAVIGATION SIDEBAR ==========
+// Fixed left navbar with quick action buttons & logout
 import { Home, FolderPlus, PlusCircle, Sparkles, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,14 +8,16 @@ export default function Navbar({ onOpenProjectModal, onOpenTaskModal, logout }) 
 
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-      {/* Logo */}
+      {/* ========== NAVBAR SECTIONS ========== */}
+      {/* Logo & branding */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-800">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
           ProjectFlow
         </h1>
       </div>
 
-      {/* Navigation */}
+      {/* ========== QUICK ACTION BUTTONS ========== */}
+      {/* Dashboard, New Project, Quick Task, Upgrade buttons */}
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           <li>
@@ -55,7 +59,8 @@ export default function Navbar({ onOpenProjectModal, onOpenTaskModal, logout }) 
         </ul>
       </nav>
 
-      {/* Logout */}
+      {/* ========== LOGOUT BUTTON ========== */}
+      {/* Bottom fixed button for user to end session */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <button
           onClick={logout}

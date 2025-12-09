@@ -1,9 +1,13 @@
+// ========== MAIN APP COMPONENT ==========
+// Route configuration with protected dashboard & authentication pages
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import { useState } from 'react';
 
+// ========== APP ROUTER & AUTH STATE ==========
+// Token stored in localStorage, protected routes redirect to login
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
@@ -14,6 +18,8 @@ function App() {
 
   return(
     <BrowserRouter>
+      {/* ========== ROUTE DEFINITIONS ========== */}
+      {/* Dashboard protected: requires valid token */}
       <Routes>
           <Route path="/login" element={<LoginPage setToken={setToken} />} />
           <Route path="/register" element={<RegisterPage setToken={setToken} />} />          <Route/>

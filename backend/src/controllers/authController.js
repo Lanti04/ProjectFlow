@@ -1,20 +1,12 @@
-// backend/src/controllers/authController.js
+// ========== AUTHENTICATION CONTROLLER ==========
+// Handles user registration & login with JWT token generation
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 import { pool } from "../db.js";
 
-
-// Reuse your existing pool (we'll move this to config later)
-/* const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD || undefined,
-  port: process.env.DB_PORT,
-});
-*/
-
+// ========== REGISTER ENDPOINT ==========
+// Creates new user with hashed password & returns JWT token
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -57,6 +49,9 @@ export const register = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// ========== LOGIN ENDPOINT ==========
+// Verifies credentials & returns JWT token if valid
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;

@@ -1,3 +1,5 @@
+// ========== AUTHENTICATION ROUTES ==========
+// Handles user registration, login, profile retrieval & logout
 import express from 'express';
 import { register, login } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
@@ -7,6 +9,9 @@ const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
+
+// ========== GET CURRENT USER ==========
+// Protected route: returns authenticated user's profile data
 router.get('/me', protect, async (req, res) => {
   try {
     console.log('ME route hit — req.user:', req.user);

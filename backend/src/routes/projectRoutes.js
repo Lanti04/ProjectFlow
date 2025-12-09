@@ -1,10 +1,13 @@
+// ========== PROJECT & TASK ROUTES ==========
+// CRUD operations for projects & tasks with progress auto-calculation
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { pool } from "../db.js";
 
 const router = express.Router();
 
-// CREATE PROJECT
+// ========== CREATE PROJECT ==========
+// Protected route: inserts new project for authenticated user
 router.post('/projects', protect, async (req, res) => {
   try {
     const { title, description, deadline } = req.body;
@@ -22,7 +25,8 @@ router.post('/projects', protect, async (req, res) => {
   }
 });
 
-// CREATE TASK
+// ========== CREATE TASK ==========
+// Protected route: creates task within project & validates ownership
 router.post('/tasks', protect, async (req, res) => {
   try {
     const { project_id, title, due_date } = req.body;
@@ -48,7 +52,8 @@ router.post('/tasks', protect, async (req, res) => {
   }
 });
 
-// TOGGLE TASK COMPLETION
+// ========== TOGGLE TASK COMPLETION ==========
+// Protected route: toggles task status & auto-updates project progress
 router.patch('/tasks/:id/toggle', protect, async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -77,7 +82,8 @@ router.patch('/tasks/:id/toggle', protect, async (req, res) => {
   }
 });
 
-// DELETE TASK
+// ========== DELETE TASK ==========
+// Protected route: removes task & recalculates project progress
 router.delete('/tasks/:id', protect, async (req, res) => {
   try {
     const taskId = req.params.id;

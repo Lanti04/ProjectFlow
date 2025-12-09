@@ -1,3 +1,6 @@
+// ========== REGISTRATION PAGE ==========
+// New user signup with name, email & password
+// Hashes password server-side & generates JWT token
 import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,6 +12,8 @@ export default function RegisterPage({ setToken }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // ========== HANDLE REGISTRATION SUBMISSION ==========
+  // Creates new user account, stores token, & navigates to dashboard
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

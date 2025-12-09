@@ -1,3 +1,6 @@
+// ========== LOGIN PAGE ==========
+// User authentication with email & password
+// Saves JWT token to localStorage & redirects to dashboard
 import { useState } from "react";
 import axios from 'axios';
 import { Link, useNavigate } from "react-router-dom";
@@ -8,6 +11,8 @@ export default function LoginPage({ setToken }) {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // ========== HANDLE LOGIN SUBMISSION ==========
+    // Authenticates user, stores token, & navigates to dashboard
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {

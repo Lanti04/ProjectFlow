@@ -1,3 +1,5 @@
+// ========== DASHBOARD ROUTES ==========
+// Fetches all user's projects & tasks in single endpoint
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
 import pkg from 'pg';

@@ -5,18 +5,26 @@ import confetti from 'canvas-confetti';
 import Navbar from '../components/Navbar';
 import { Trash2, CheckCircle, Circle } from 'lucide-react';
 
+// ========== DASHBOARD COMPONENT ==========
+// Main page showing user's projects and tasks
+// Handles all CRUD operations and real-time updates
 export default function Dashboard({ token, logout }) {
+  // ========== STATE MANAGEMENT ==========
+  // Main data state from backend (projects & tasks)
   const [data, setData] = useState({ projects: [], tasks: [] });
   const [loading, setLoading] = useState(true);
+  // Focus mode: minimalist view for deep work
   const [focusMode, setFocusMode] = useState(false);
 
-  // Modal states
+  // ========== MODAL STATES ==========
+  // Controls visibility and content of project/task creation forms
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [projectForm, setProjectForm] = useState({ title: '', description: '', deadline: '' });
   const [taskForm, setTaskForm] = useState({ title: '', due_date: '', project_id: '' });
 
+  // ========== API CALLS & DATA FETCHING ==========
   const fetchData = async () => {
     if (!token) return logout();
     try {
@@ -31,21 +39,26 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
+  // Auto-fetch data when token changes (user logs in)
   useEffect(() => {
     fetchData();
   }, [token]);
 
+  // ========== USER INTERACTIONS & FEEDBACK ==========
+  // Sound effect for task completion
   const playSound = () => {
     const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3');
     audio.volume = 0.6;
     audio.play().catch(() => {});
   };
 
+  // Toggle task completion status with celebration effects
   const toggleTask = async (taskId) => {
     try {
       await axios.patch(`http://localhost:5000/api/tasks/${taskId}/toggle`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      // Celebrate task completion with confetti & sound
       confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
       playSound();
       fetchData();
@@ -54,6 +67,7 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
+  // Delete a task with confirmation
   const deleteTask = async (taskId) => {
     if (!confirm('Delete this task forever?')) return;
     try {
@@ -66,6 +80,7 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
+  // Delete entire project (cascades to delete all associated tasks)
   const deleteProject = async (projectId) => {
     if (!confirm('Delete project and ALL its tasks?')) return;
     try {
@@ -78,6 +93,8 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
+  // ========== FORM HANDLERS ==========
+  // Handle both creating new and editing existing projects
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -99,6 +116,7 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
+  // Create new task and assign to selected project
   const handleTaskSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -117,14 +135,19 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
+  // ========== DERIVED DATA & CALCULATIONS ==========
+  // Filter tasks due today for the "Today's Mission" section
   const todayTasks = data.tasks.filter(t => t.due_date && isToday(parseISO(t.due_date)));
+  // Calculate completion statistics
   const totalTasks = data.tasks.length;
   const completedTasks = data.tasks.filter(t => t.status === 'completed').length;
 
   if (loading) return <div className="ml-64 flex items-center justify-center min-h-screen text-6xl font-bold">Loading...</div>;
 
+  // ========== MAIN RENDER ==========
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Navbar with quick action buttons */}
       <Navbar
         onOpenProjectModal={() => {
           setEditingProject(null);
@@ -136,6 +159,8 @@ export default function Dashboard({ token, logout }) {
       />
 
       <div className="ml-64 p-10">
+        {/* ========== HEADER SECTION ========== */}
+        {/* Dashboard stats: tasks today & completion progress */}
         <div className="flex justify-between items-center mb-16">
           <div>
             <h1 className="text-7xl font-black mb-4">Welcome back, Legend</h1>
@@ -150,8 +175,10 @@ export default function Dashboard({ token, logout }) {
           </button>
         </div>
 
-        {/* TODAY'S TASKS */}
+        {/* ========== TODAY'S TASKS SECTION ========== */}
+        {/* High-priority: Tasks due TODAY with toggle & delete actions */}
         <h2 className="text-5xl font-black mb-10">Today's Mission</h2>
+        {/* All tasks completed state */}
         {todayTasks.length === 0 ? (
           <div className="bg-white rounded-3xl shadow-2xl p-40 text-center">
             <p className="text-9xl font-black text-green-600 mb-8">ALL DONE!</p>
@@ -159,6 +186,7 @@ export default function Dashboard({ token, logout }) {
           </div>
         ) : (
           <div className="space-y-10">
+            {/* Task cards with completion toggle & delete */}
             {todayTasks.map((task, i) => (
               <div
                 key={task.id}
@@ -186,10 +214,12 @@ export default function Dashboard({ token, logout }) {
           </div>
         )}
 
-        {/* PROJECTS */}
+        {/* ========== PROJECTS SECTION ========== */}
+        {/* "Your Empire": All projects in grid layout - hidden in focus mode */}
         {!focusMode && (
           <>
             <h2 className="text-5xl font-black mt-32 mb-16">Your Empire</h2>
+            {/* Project cards with progress bars */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
               {data.projects.map((p, i) => (
                 <div key={p.id} className="bg-white rounded-3xl shadow-2xl p-12 hover:shadow-4xl hover:scale-105 transition-all duration-500 group">
@@ -216,11 +246,13 @@ export default function Dashboard({ token, logout }) {
         )}
       </div>
 
-      {/* PROJECT MODAL */}
+      {/* ========== MODALS ========== */}
+      {/* PROJECT CREATION/EDITING MODAL */}
       {showProjectModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl p-12 w-full max-w-lg shadow-4xl">
             <h2 className="text-4xl font-bold mb-10">{editingProject ? 'Edit' : 'New'} Project</h2>
+            {/* Form fields: title, description, deadline */}
             <form onSubmit={handleProjectSubmit}>
               <input
                 placeholder="Title"
@@ -258,11 +290,12 @@ export default function Dashboard({ token, logout }) {
         </div>
       )}
 
-      {/* TASK MODAL */}
+      {/* TASK CREATION MODAL */}
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl p-12 w-full max-w-lg shadow-4xl">
             <h2 className="text-4xl font-bold mb-10">Quick Task</h2>
+            {/* Form fields: title, project select, due date */}
             <form onSubmit={handleTaskSubmit}>
               <input
                 placeholder="Task title"
