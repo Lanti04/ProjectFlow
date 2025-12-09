@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js'
 import { Pool } from "pg";
 import { pool } from "./db.js";
+import projectRoutes from './routes/projectRoutes.js';
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -27,8 +28,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-
 app.use('/api', dashboardRoutes);
+app.use('/api', projectRoutes);
 
 // PostgreSQL Connection Pool
 /* const pool = new Pool({
