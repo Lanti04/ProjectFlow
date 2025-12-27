@@ -51,32 +51,37 @@ export const register = async (req, res) => {
 };
 
 // ========== LOGIN ENDPOINT ==========
-// Verifies credentials & returns JWT token if valid
+// Verifies credentials & returns JWT token with current premium status
 export const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password required'});
-        }
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password required' });
+    }
 
-        //fidn the user
-        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (result.rows.length === 0) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+    // Find the user
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-        const user = result.rows[0];
+    const user = result.rows[0];
 
-        //check password
-        const isMatching = await bcrypt.compare(password, user.password_hash);
-        if (!isMatching) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+    // Check password
+    const isMatching = await bcrypt.compare(password, user.password_hash);
+    if (!isMatching) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-        //create JWT
-        const token = jwt.sign(
-      { userId: user.id },
+    // CREATE TOKEN WITH CURRENT PREMIUM STATUS FROM DB
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        isPremium: user.is_premium || false,   // ← INCLUDE PREMIUM STATUS
+        planType: user.plan_type || 'free'     // ← INCLUDE PLAN TYPE
+      },
       process.env.JWT_SECRET || 'fallback-secret-very-long-string',
       { expiresIn: '7d' }
     );
@@ -87,12 +92,13 @@ export const login = async (req, res) => {
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        isPremium: user.is_premium || false,  // ← RETURN PREMIUM STATUS
+        planType: user.plan_type || 'free'
       }
     });
-        
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };

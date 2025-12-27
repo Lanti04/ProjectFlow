@@ -4,17 +4,20 @@ import { format, isToday, parseISO } from 'date-fns';
 import confetti from 'canvas-confetti';
 import Navbar from '../components/Navbar';
 import { Trash2, CheckCircle, Circle } from 'lucide-react';
+import AIChatPanel from '../components/AIChatPannel';
+import PomodoroTimer from '../components/PomodoroTimer';
 
 // ========== DASHBOARD COMPONENT ==========
 // Main page showing user's projects and tasks
 // Handles all CRUD operations and real-time updates
 export default function Dashboard({ token, logout }) {
+
+
   // ========== STATE MANAGEMENT ==========
-  // Main data state from backend (projects & tasks)
   const [data, setData] = useState({ projects: [], tasks: [] });
   const [loading, setLoading] = useState(true);
-  // Focus mode: minimalist view for deep work
   const [focusMode, setFocusMode] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   // ========== MODAL STATES ==========
   // Controls visibility and content of project/task creation forms
@@ -66,6 +69,20 @@ export default function Dashboard({ token, logout }) {
       alert('Failed to update task');
     }
   };
+
+  // ========== MEMBERSHIP CHECKING TRUE/FALSE ==========
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setIsPremium(payload.isPremium || false);
+      } catch (error) {
+        setIsPremium(false);
+      }
+    }
+  }, []);
+
 
   // Delete a task with confirmation
   const deleteTask = async (taskId) => {
@@ -187,30 +204,36 @@ export default function Dashboard({ token, logout }) {
         ) : (
           <div className="space-y-10">
             {/* Task cards with completion toggle & delete */}
-            {todayTasks.map((task, i) => (
-              <div
-                key={task.id}
-                className="bg-white rounded-3xl shadow-2xl p-12 flex items-center justify-between hover:shadow-3xl hover:scale-105 transition-all duration-300"
-              >
-                <div className="flex items-center gap-8">
-                  <button onClick={() => toggleTask(task.id)}>
-                    {task.status === 'completed' ? 
-                      <CheckCircle className="w-20 h-20 text-green-500" /> : 
-                      <Circle className="w-20 h-20 text-gray-300 hover:text-indigo-600 transition" />
-                    }
-                  </button>
-                  <div>
-                    <h3 className={`text-4xl font-bold ${task.status === 'completed' ? 'line-through text-gray-400' : ''}`}>
-                      {task.title}
-                    </h3>
-                    <p className="text-2xl text-gray-600 mt-3">{task.project_title}</p>
-                  </div>
-                </div>
-                <button onClick={() => deleteTask(task.id)} className="text-red-500 hover:text-red-700">
-                  <Trash2 className="w-12 h-12" />
-                </button>
-              </div>
-            ))}
+            {todayTasks.map(task => (
+  <div key={task.id} className="bg-white rounded-3xl shadow-2xl p-10 hover:shadow-3xl transition">
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-6">
+        <button onClick={() => toggleTask(task.id)}>
+          {task.status === 'completed' ? 
+            <CheckCircle className="w-14 h-14 text-green-500" /> : 
+            <Circle className="w-14 h-14 text-gray-400 hover:text-indigo-600 transition" />
+          }
+        </button>
+        <div>
+          <h3 className={`text-3xl font-bold ${task.status === 'completed' ? 'line-through text-gray-400' : ''}`}>
+            {task.title}
+          </h3>
+          <p className="text-xl text-gray-600">{task.project_title}</p>
+        </div>
+      </div>
+      <button onClick={() => deleteTask(task.id)} className="text-red-500 hover:text-red-700">
+        <Trash2 className="w-10 h-10" />
+      </button>
+    </div>
+
+    {/* POMODORO TIMER — APPEARS UNDER EVERY TASK */}
+    <PomodoroTimer 
+      taskId={task.id} 
+      token={token} 
+      onComplete={() => toggleTask(task.id)} 
+    />
+  </div>
+))}
           </div>
         )}
 
@@ -333,6 +356,8 @@ export default function Dashboard({ token, logout }) {
           </div>
         </div>
       )}
-    </div>
+      {/* AI CHAT PANEL */}
+      <AIChatPanel token={token} isPremium={isPremium} />  
+      </div>
   );
 }

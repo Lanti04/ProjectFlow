@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",   // ← THIS LINE WAS PROBABLY MISSING OR WRONG
+    "./src/**/*.{js,ts,jsx,tsx}",   
   ],
   theme: {
     extend: {},

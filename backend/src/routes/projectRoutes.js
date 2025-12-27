@@ -108,7 +108,7 @@ router.delete('/tasks/:id', protect, async (req, res) => {
   }
 });
 
-// DELETE PROJECT — FIXED THE TYPO HERE
+// DELETE PROJECT 
 router.delete('/projects/:id', protect, async (req, res) => {
   try {
     const projectId = req.params.id;

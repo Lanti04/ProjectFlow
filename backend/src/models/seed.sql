@@ -13,3 +13,4 @@ INSERT INTO tasks (project_id, title, due_date, status) VALUES
 (1, 'Implement insert operation', '2025-05-25', 'in_progress'),
 (2, 'Deploy to Vercel', '2025-05-18', 'todo'),
 (2, 'Add AI feature', null, 'todo');
+

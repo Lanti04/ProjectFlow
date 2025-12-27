@@ -8,6 +8,8 @@ import dashboardRoutes from './routes/dashboardRoutes.js'
 import { Pool } from "pg";
 import { pool } from "./db.js";
 import projectRoutes from './routes/projectRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -46,6 +48,14 @@ pool
 app.get("/", (req, res) => {
   res.json({ message: "ProjectFlow API + DB Ready!" });
 });
+
+// ========== AI ROUTES ==========
+app.use('/api/ai', aiRoutes);
+
+
+// ========== PAYMENT ROUTES ==========
+app.use('/api/payment', paymentRoutes);
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

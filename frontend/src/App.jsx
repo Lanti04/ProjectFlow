@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import { useState } from 'react';
+import PricingPage from './pages/Pricingpage';
+import SuccessPage from './pages/SuccessPage';
 
 // ========== APP ROUTER & AUTH STATE ==========
 // Token stored in localStorage, protected routes redirect to login
@@ -25,6 +27,8 @@ function App() {
           <Route path="/register" element={<RegisterPage setToken={setToken} />} />          <Route/>
           <Route path="/dashboard" element={token ? <Dashboard token={token} logout={logout} /> : <Navigate to="/login" />} />
           <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/success" element={<SuccessPage />} />
       </Routes>
     </BrowserRouter>
   );
