@@ -37,7 +37,7 @@ router.post('/chat', protect, async (req, res) => {
     const context = await getUserContext(userId);
 
     const { text } = await generateText({
-      model: xai('grok-beta'), // Latest model as of Dec 2025
+      model: xai('grok-beta'), // Latest model 
       prompt: `
 You are Grok, the helpful AI assistant for ProjectFlow, a student task manager. Be encouraging, concise, and useful. Use bullet points for lists.
 

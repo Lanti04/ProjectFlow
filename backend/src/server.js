@@ -10,6 +10,7 @@ import { pool } from "./db.js";
 import projectRoutes from './routes/projectRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -51,6 +52,9 @@ app.get("/", (req, res) => {
 
 // ========== AI ROUTES ==========
 app.use('/api/ai', aiRoutes);
+
+// ========== USER ROUTES ==========
+app.use('/api/user', userRoutes);
 
 
 // ========== PAYMENT ROUTES ==========

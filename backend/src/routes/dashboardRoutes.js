@@ -16,18 +16,19 @@ const router = express.Router();
 
 // getting everything the dashboard needs
 router.get('/dashboard', protect, async (req, res) => {
-    try {
-        const userId = req.user.userId;
+  try {
+    const userId = req.user.userId;
 
-        //getting projects
-        const projectsResult = await pool.query(
-            `SELECT id, title, description, deadline, status, progress, created_at 
-            FROM projects 
-            WHERE user_id = $1 
-            ORDER BY created_at DESC`,
-        [userId]
-        );
-        //  Get all tasks (with project title for display)
+    // Get projects
+    const projectsResult = await pool.query(
+      `SELECT id, title, description, deadline, status, progress, created_at 
+       FROM projects 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    // Get tasks
     const tasksResult = await pool.query(
       `SELECT t.id, t.title, t.due_date, t.status, t.project_id, p.title AS project_title
        FROM tasks t
@@ -37,9 +38,34 @@ router.get('/dashboard', protect, async (req, res) => {
       [userId]
     );
 
+    // Get user data — SAFE, EVEN IF COLUMN MISSING
+    let studyStreak = 0;
+    let isPremium = false;
+    let planType = 'free';
+
+    try {
+      const userResult = await pool.query(
+        'SELECT study_streak, is_premium, plan_type FROM users WHERE id = $1',
+        [userId]
+      );
+      if (userResult.rows[0]) {
+        studyStreak = userResult.rows[0].study_streak || 0;
+        isPremium = userResult.rows[0].is_premium || false;
+        planType = userResult.rows[0].plan_type || 'free';
+      }
+    } catch (err) {
+      console.log('Streak column not available yet — using default 0');
+      // Ignore error — column might be added later
+    }
+
     res.json({
       projects: projectsResult.rows,
-      tasks: tasksResult.rows
+      tasks: tasksResult.rows,
+      user: {
+        study_streak: studyStreak,
+        isPremium: isPremium,
+        planType: planType
+      }
     });
   } catch (error) {
     console.error('Dashboard route error:', error);

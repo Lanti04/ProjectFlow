@@ -24,7 +24,7 @@ function App() {
       {/* Dashboard protected: requires valid token */}
       <Routes>
           <Route path="/login" element={<LoginPage setToken={setToken} />} />
-          <Route path="/register" element={<RegisterPage setToken={setToken} />} />          <Route/>
+          <Route path="/register" element={<RegisterPage setToken={setToken} />} />
           <Route path="/dashboard" element={token ? <Dashboard token={token} logout={logout} /> : <Navigate to="/login" />} />
           <Route path="*" element={<Navigate to="/login" />} />
           <Route path="/pricing" element={<PricingPage />} />
