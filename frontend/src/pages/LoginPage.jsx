@@ -1,5 +1,4 @@
 // ========== LOGIN PAGE ==========
-// User authentication with email & password
 // Saves JWT token to localStorage & redirects to dashboard
 import { useState } from "react";
 import axios from 'axios';
@@ -14,13 +13,13 @@ export default function LoginPage({ setToken }) {
     // ========== HANDLE LOGIN SUBMISSION ==========
     // Authenticates user, stores token, & navigates to dashboard
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); 
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', {
+            const res = await axios.post('http://localhost:5000/api/auth/login', { 
                 email, 
                 password,
             });
-            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('token', res.data.token); 
             setToken(res.data.token);
             navigate('/dashboard');
         } catch (error) {

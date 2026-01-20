@@ -1,5 +1,4 @@
 // ========== REGISTRATION PAGE ==========
-// New user signup with name, email & password
 // Hashes password server-side & generates JWT token
 import { useState } from 'react';
 import axios from 'axios';
@@ -31,7 +30,7 @@ export default function RegisterPage({ setToken }) {
   };
 
   return (
-  <div style={{
+  <div style={{     
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
@@ -39,7 +38,7 @@ export default function RegisterPage({ setToken }) {
     background: '#f0f2f5',
     fontFamily: 'Arial, sans-serif'
   }}>
-    <div style={{
+    <div style={{ 
       width: '100%',
       maxWidth: '420px',
       padding: '40px 30px',

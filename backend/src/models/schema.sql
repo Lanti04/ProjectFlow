@@ -4,6 +4,8 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(100) NOT NULL,
+    study_streak INTEGER DEFAULT 0,
+    last_study_date DATE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -30,11 +32,11 @@ CREATE TABLE tasks (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes (these make your app FAST)
+-- Indexes (these indexes make the app FAST)
 CREATE INDEX idx_projects_user_id ON projects(user_id);
 CREATE INDEX idx_tasks_project_id ON tasks(project_id);
 CREATE INDEX idx_tasks_status ON tasks(status);
 CREATE INDEX idx_tasks_due_date ON tasks(due_date);
 CREATE INDEX idx_projects_deadline ON projects(deadline);
 
-UPDATE tasks SET due_date = CURRENT_DATE WHERE id = 3;
+UPDATE tasks SET due_date = CURRENT_DATE WHERE id = 3; --ztesting purposes

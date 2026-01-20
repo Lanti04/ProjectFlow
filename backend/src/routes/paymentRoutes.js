@@ -1,4 +1,3 @@
-// backend/src/routes/paymentRoutes.js — FINAL, 100 % WORKING
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
 import Stripe from 'stripe';
@@ -85,13 +84,13 @@ router.post('/verify', protect, async (req, res) => {
 // WEBHOOK — PAYMENT SUCCESS
 router.post(
   '/webhook',
-  express.raw({ type: 'application/json' }),
+  express.raw({ type: 'application/json' }), //express.raw keeps body as-is for stripe verification, express.json would change it
   async (req, res) => {
-    const sig = req.headers['stripe-signature'];
+    const sig = req.headers['stripe-signature']; //stripe http header for verification that this request is from stripe
 
     let event;
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); //construct event verifies request, security gate
     } catch (err) {
       console.error('Webhook signature error:', err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -99,7 +98,7 @@ router.post(
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const userId = session.client_reference_id;
+      const userId = session.client_reference_id; 
       const plan = session.metadata.plan;
 
       await pool.query(

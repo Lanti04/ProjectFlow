@@ -3,8 +3,8 @@ import { Sparkles, Check } from 'lucide-react';
 import axios from 'axios';
 import { useState } from 'react';
 
-export default function PricingPage() {
-  const navigate = useNavigate();
+export default function PricingPage() { 
+  const navigate = useNavigate(); 
   const [loading, setLoading] = useState(false);
 
   const handleUpgrade = async (plan) => {
@@ -40,7 +40,7 @@ export default function PricingPage() {
             <ul className="space-y-6 mb-12">
               {['Unlimited Grok chat', 'Task summaries', 'Exam countdowns', 'Daily insights'].map((f, i) => (
                 <li key={i} className="flex items-center gap-4 text-xl">
-                  <Check className="w-8 h-8 text-green-500" />
+                  <Check className="w-8 h-8 text-green-500" /> 
                   <span>{f}</span>
                 </li>
               ))}

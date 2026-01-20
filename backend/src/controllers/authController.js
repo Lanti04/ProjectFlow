@@ -7,7 +7,7 @@ import { pool } from "../db.js";
 
 // ========== REGISTER ENDPOINT ==========
 // Creates new user with hashed password & returns JWT token
-export const register = async (req, res) => {
+export const register = async (req, res) => { 
   try {
     const { name, email, password } = req.body;
 
@@ -22,8 +22,8 @@ export const register = async (req, res) => {
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt(10);  
+    const password_hash = await bcrypt.hash(password, salt); 
 
     // Insert user
     const result = await pool.query(
@@ -34,7 +34,8 @@ export const register = async (req, res) => {
     // Create JWT
     const token = jwt.sign(
       { userId: result.rows[0].id },
-      process.env.JWT_SECRET || 'fallback-secret-very-long-string',
+      // in real apps,we  use a strong secret from env, not hardcoded , if (!process.env.JWT_SECRET) throw new Error('Missing JWT_SECRET')
+      process.env.JWT_SECRET || 'fallback-secret-very-long-string', 
       { expiresIn: '7d' }
     );
 

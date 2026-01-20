@@ -1,4 +1,3 @@
-// src/components/PomodoroTimer.jsx
 import { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Bell } from 'lucide-react';
 import confetti from 'canvas-confetti';

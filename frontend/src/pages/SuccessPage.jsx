@@ -39,7 +39,7 @@ useEffect(() => {
   .then(() => {
     setLoading(false);
     // Force refresh dashboard to see premium status
-    setTimeout(() => navigate('/dashboard'), 1500);
+    setTimeout(() => navigate('/dashboard'), 1500); 
   })
   .catch(() => {
     alert('Payment verification failed — but it probably worked! Refresh dashboard.');
