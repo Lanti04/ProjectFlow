@@ -22,8 +22,8 @@ export const register = async (req, res) => {
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);  
-    const password_hash = await bcrypt.hash(password, salt); 
+    const salt = await bcrypt.genSalt(10);   
+    const password_hash = await bcrypt.hash(password, salt);
 
     // Insert user
     const result = await pool.query(
@@ -67,10 +67,10 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const user = result.rows[0];
+    const user = result.rows[0]; // get user 
 
     // Check password
-    const isMatching = await bcrypt.compare(password, user.password_hash);
+    const isMatching = await bcrypt.compare(password, user.password_hash); 
     if (!isMatching) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

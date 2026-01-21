@@ -13,7 +13,7 @@ export default function SuccessPage() {
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     if (sessionId) {
-      axios.post('http://localhost:5000/api/payment/verify', { sessionId }, {
+      axios.post('http://localhost:3001/api/payment/verify', { sessionId }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }).then(() => {
         setLoading(false);
@@ -33,7 +33,7 @@ useEffect(() => {
     return;
   }
 
-  axios.post('http://localhost:5000/api/payment/verify', { sessionId }, {
+  axios.post('http://localhost:3001/api/payment/verify', { sessionId }, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
   })
   .then(() => {

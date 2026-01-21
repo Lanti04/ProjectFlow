@@ -20,7 +20,7 @@ router.post('/create-checkout-session', protect, async (req, res) => {
             currency: 'usd',
             product_data: { name: `ProjectFlow AI ${plan === 'pro' ? 'Pro' : 'Lite'}` },
             unit_amount: priceInCents,
-            recurring: { interval: 'month' },
+            recurring: { interval: 'month' }, 
           },
           quantity: 1,
         },
@@ -39,27 +39,7 @@ router.post('/create-checkout-session', protect, async (req, res) => {
   }
 });
 
-/*
-// VERIFY SESSION (for SuccessPage)
-router.post('/verify', protect, async (req, res) => {
-  try {
-    const { sessionId } = req.body;
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    if (session.payment_status === 'paid') {
-      // Mark user as premium (in case webhook hasn't fired yet)
-      await pool.query(
-        'UPDATE users SET is_premium = true, plan_type = $1 WHERE id = $2',
-        [session.metadata.plan || 'pro', req.user.userId]
-      );
-      return res.json({ success: true });
-    }
-    res.status(400).json({ error: 'Not paid' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-*/
 
 router.post('/verify', protect, async (req, res) => {
   try {
@@ -68,10 +48,10 @@ router.post('/verify', protect, async (req, res) => {
 
     if (session.payment_status === 'paid') {
       await pool.query(
-        'UPDATE users SET is_premium = true, plan_type = $1 WHERE id = $2',
+        'UPDATE users SET is_premium = true, plan_type = $1 WHERE id = $2',  //$1 is plan, $2 is userId for sql injection safety
         [session.metadata.plan || 'pro', req.user.userId]
       );
-      res.json({ success: true });
+      res.json({ success: true }); 
     } else {
       res.status(400).json({ error: 'Not paid' });
     }
@@ -83,8 +63,8 @@ router.post('/verify', protect, async (req, res) => {
 
 // WEBHOOK — PAYMENT SUCCESS
 router.post(
-  '/webhook',
-  express.raw({ type: 'application/json' }), //express.raw keeps body as-is for stripe verification, express.json would change it
+  '/webhook',  //webhook is endpoint stripe calls to notify about events like payment success
+  express.raw({ type: 'application/json' }), 
   async (req, res) => {
     const sig = req.headers['stripe-signature']; //stripe http header for verification that this request is from stripe
 

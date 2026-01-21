@@ -10,10 +10,10 @@ export default function PricingPage() {
   const handleUpgrade = async (plan) => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/payment/create-checkout-session', {
+      const res = await axios.post('http://localhost:3001/api/payment/create-checkout-session', { 
         plan
       }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
       });
       window.location.href = res.data.url; // Redirect to Stripe Checkout
     } catch (err) {

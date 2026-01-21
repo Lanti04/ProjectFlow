@@ -28,9 +28,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ========== MIDDLEWARE SETUP ==========
-// Enable CORS & JSON parsing for all requests
-app.use(cors());
+// CORS configuration - explicitly allow frontend origin
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Debug middleware - log all requests
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.path}`);
+  next();
+});
 
 // ========== API ROUTES ==========
 // All endpoints prefixed with /api for organization
@@ -46,6 +59,10 @@ pool
   .catch((err) => console.error("DB Connection Error:", err.stack));
 
 // Test Route
+app.get("/test", (req, res) => {
+  res.json({ message: "Backend is working!" });
+});
+
 app.get("/", (req, res) => {
   res.json({ message: "ProjectFlow API + DB Ready!" });
 });

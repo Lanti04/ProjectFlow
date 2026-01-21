@@ -4,12 +4,12 @@ import { generateText } from 'ai';
 import { xai } from '@ai-sdk/xai';
 import { pool } from '../db.js';
 
-const router = express.Router();
+const router = express.Router(); 
 
 // Get user's data for AI context
 const getUserContext = async (userId) => {
   const tasks = await pool.query(
-    'SELECT title, due_date, status FROM tasks t JOIN projects p ON t.project_id = p.id WHERE p.user_id = $1 ORDER BY due_date ASC LIMIT 10',
+    'SELECT title, due_date, status FROM tasks t JOIN projects p ON t.project_id = p.id WHERE p.user_id = $1 ORDER BY due_date ASC LIMIT 10', 
     [userId]
   );
 
@@ -62,7 +62,7 @@ Respond in <200 words. Focus on tasks, progress, motivation, or scheduling. Be f
 */
 
 // SIMPLE HARDCODED RESPONSES FOR DEMO PURPOSES
-router.post('/chat', protect, async (req, res) => {
+router.post('/chat', protect, async (req, res) => { 
   const msg = req.body.message.toLowerCase();
 
   let reply = "Hey! I'm Grok, your AI study buddy!";

@@ -8,9 +8,17 @@ const router = express.Router();
 
 // ========== GET DASHBOARD DATA ==========
 // Protected route: returns user's projects & tasks with joined data
-router.get('/dashboard', protect, async (req, res) => {
+router.get('/dashboard', protect, async (req, res) => { 
     try {
         const userId = req.user.userId;
+
+        // Getting user data including streak
+        const userResult = await pool.query(
+            `SELECT id, name, email, study_streak, last_study_date, is_premium, plan_type 
+            FROM users 
+            WHERE id = $1`,
+            [userId]
+        );
 
         // Getting projects for the user
         const projectsResult = await pool.query(
@@ -32,6 +40,7 @@ router.get('/dashboard', protect, async (req, res) => {
         );
 
         res.json({
+            user: userResult.rows[0],
             projects: projectsResult.rows,
             tasks: tasksResult.rows
         });

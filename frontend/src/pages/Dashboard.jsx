@@ -13,7 +13,7 @@ import FlashcardGenerator from "../components/FlashcardGenerator";
 // Handles all CRUD operations and real-time updates
 export default function Dashboard({ token, logout }) {
   // ========== STATE MANAGEMENT ==========
-  const [data, setData] = useState({ projects: [], tasks: [] });
+  const [data, setData] = useState({ projects: [], tasks: [] }); 
   const [loading, setLoading] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
@@ -38,10 +38,12 @@ export default function Dashboard({ token, logout }) {
   const fetchData = async () => {
     if (!token) return logout();
     try {
-      const res = await axios.get("http://localhost:5000/api/dashboard", {
+      const res = await axios.get("http://localhost:3001/api/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setData(res.data);
+      // Update premium status from backend response (updated after payment)
+      setIsPremium(res.data.user?.is_premium || false);
     } catch (err) {
       logout();
     } finally {
@@ -68,7 +70,7 @@ export default function Dashboard({ token, logout }) {
   const toggleTask = async (taskId) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/tasks/${taskId}/toggle`,
+        `http://localhost:3001/api/tasks/${taskId}/toggle`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -79,7 +81,7 @@ export default function Dashboard({ token, logout }) {
       playSound();
 
       await axios.post(
-        "http://localhost:5000/api/user/update-streak",
+        "http://localhost:3001/api/user/update-streak",
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -91,24 +93,15 @@ export default function Dashboard({ token, logout }) {
     }
   };
 
-  // ========== MEMBERSHIP CHECKING TRUE/FALSE ==========
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setIsPremium(payload.isPremium || false);
-      } catch (error) {
-        setIsPremium(false);
-      }
-    }
-  }, []);
+  // ========== PREMIUM STATUS TRACKING ==========
+  // isPremium is now updated from fetchData() when data loads
+  // No need to decode from JWT token anymore
 
   // Delete a task with confirmation
   const deleteTask = async (taskId) => {
     if (!confirm("Delete this task forever?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
+      await axios.delete(`http://localhost:3001/api/tasks/${taskId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -121,7 +114,7 @@ export default function Dashboard({ token, logout }) {
   const deleteProject = async (projectId) => {
     if (!confirm("Delete project and ALL its tasks?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/projects/${projectId}`, {
+      await axios.delete(`http://localhost:3001/api/projects/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
@@ -137,14 +130,14 @@ export default function Dashboard({ token, logout }) {
     try {
       if (editingProject) {
         await axios.put(
-          `http://localhost:5000/api/projects/${editingProject.id}`,
+          `http://localhost:3001/api/projects/${editingProject.id}`,
           projectForm,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
       } else {
-        await axios.post("http://localhost:5000/api/projects", projectForm, {
+        await axios.post("http://localhost:3001/api/projects", projectForm, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -162,7 +155,7 @@ export default function Dashboard({ token, logout }) {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:5000/api/tasks",
+        "http://localhost:3001/api/tasks",
         {
           project_id: taskForm.project_id,
           title: taskForm.title,

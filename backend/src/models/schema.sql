@@ -32,8 +32,8 @@ CREATE TABLE tasks (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes (these indexes make the app FAST)
-CREATE INDEX idx_projects_user_id ON projects(user_id);
+-- Indexes (these indexes make the app FAST) 
+CREATE INDEX idx_projects_user_id ON projects(user_id); 
 CREATE INDEX idx_tasks_project_id ON tasks(project_id);
 CREATE INDEX idx_tasks_status ON tasks(status);
 CREATE INDEX idx_tasks_due_date ON tasks(due_date);

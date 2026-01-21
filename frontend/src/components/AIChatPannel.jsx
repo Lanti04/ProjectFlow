@@ -9,9 +9,9 @@ export default function AIChatPanel({ token, isPremium }) {
   ]);
   const [input, setInput] = useState('');
   const [isOpen, setIsOpen] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
-  const sendMessage = async () => {
+  const sendMessage = async () => { 
     if (!input.trim()) return;
     if (!isPremium) {
       setMessages(prev => [...prev, { role: 'ai', content: 'Upgrade to Premium for unlimited Grok chats!' }]);
@@ -24,10 +24,10 @@ export default function AIChatPanel({ token, isPremium }) {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/ai/chat', {
+      const res = await axios.post('http://localhost:3001/api/ai/chat', {
         message: input
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` } 
       });
 
       setMessages(prev => [...prev, { role: 'ai', content: res.data.reply }]);
@@ -93,7 +93,7 @@ export default function AIChatPanel({ token, isPremium }) {
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}> 
             <div className={`max-w-xs px-5 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
               {msg.content}
             </div>
