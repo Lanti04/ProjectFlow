@@ -50,24 +50,29 @@ router.get('/calendar.ics', async (req, res) => {
 
     // Projects -> all-day event on deadline
     for (const project of projectsResult.rows) {
-      if (!project.deadline) continue;
-      const d = parseISO(project.deadline);
-      if (Number.isNaN(d.getTime())) continue;
+      if (!project.deadline || typeof project.deadline !== 'string') continue;
+      try {
+        const d = parseISO(project.deadline);
+        if (Number.isNaN(d.getTime())) continue;
 
-      events.push({
-        title: `Project: ${project.title}`,
-        description: `Project deadline. Progress: ${project.progress ?? 0}%`,
-        start: dateToStartArray(d),
-        duration: { days: 1 },
-        uid: `project-${project.id}@projectflow`,
-      });
+        events.push({
+          title: `Project: ${project.title}`,
+          description: `Project deadline. Progress: ${project.progress ?? 0}%`,
+          start: dateToStartArray(d),
+          duration: { days: 1 },
+          uid: `project-${project.id}@projectflow`,
+        });
+      } catch (e) {
+        console.warn(`Invalid project deadline for project ${project.id}:`, project.deadline);
+      }
     }
 
     // Tasks -> all-day event on due_date
     for (const task of tasksResult.rows) {
-      if (!task.due_date) continue;
-      const d = parseISO(task.due_date);
-      if (Number.isNaN(d.getTime())) continue;
+      if (!task.due_date || typeof task.due_date !== 'string') continue;
+      try {
+        const d = parseISO(task.due_date);
+        if (Number.isNaN(d.getTime())) continue;
 
       const title = task.project_title ? `Task: ${task.title} (${task.project_title})` : `Task: ${task.title}`;
 
@@ -78,6 +83,9 @@ router.get('/calendar.ics', async (req, res) => {
         duration: { days: 1 },
         uid: `task-${task.id}@projectflow`,
       });
+      } catch (e) {
+        console.warn(`Invalid task due_date for task ${task.id}:`, task.due_date);
+      }
     }
 
     // Create ICS

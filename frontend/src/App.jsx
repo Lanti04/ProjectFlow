@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import TrashPage from './pages/TrashPage';
 import CalendarPage from './pages/CalendarPage';
+import SharedProjectPage from './pages/SharedProjectPage';
 import { useState } from 'react';
 import PricingPage from './pages/Pricingpage';
 import SuccessPage from './pages/SuccessPage';
@@ -33,6 +34,7 @@ function App() {
           <Route path="/trash" element={token ? <TrashPage token={token} logout={logout} /> : <Navigate to="/login" />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/success" element={<SuccessPage />} />
+          <Route path="/shared-project/:token" element={<SharedProjectPage />} />
           <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

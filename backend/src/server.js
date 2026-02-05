@@ -12,6 +12,9 @@ import aiRoutes from './routes/aiRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import calendarRoutes from './routes/calendarRoutes.js';
+import tagsRoutes from './routes/tagsRoutes.js';
+import sharingRoutes from './routes/sharingRoutes.js';
+import focusRoutes from './routes/focusRoutes.js';
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -83,6 +86,14 @@ app.use('/api/payment', paymentRoutes);
 // ========== CALENDAR FEED ==========
 app.use('/api', calendarRoutes);
 
+// ========== TAGS ROUTES ==========
+app.use('/api/tags', tagsRoutes);
+
+// ========== PROJECT SHARING ROUTES ==========
+app.use('/api/projects', sharingRoutes);
+
+// ========== FOCUS MODE 2.0 ROUTES ==========
+app.use('/api/focus', focusRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

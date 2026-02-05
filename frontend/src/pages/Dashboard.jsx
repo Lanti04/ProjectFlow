@@ -3,10 +3,13 @@ import axios from "axios";
 import { format, isToday, parseISO } from "date-fns";
 import confetti from "canvas-confetti";
 import Navbar from "../components/Navbar";
-import { Trash2, CheckCircle, Circle } from "lucide-react";
+import { Trash2, CheckCircle, Circle, Share2, Focus } from "lucide-react";
 import AIChatPanel from "../components/AIChatPannel";
 import PomodoroTimer from "../components/PomodoroTimer";
 import FlashcardGenerator from "../components/FlashcardGenerator";
+import TagSelector from "../components/TagSelector";
+import ShareModal from "../components/ShareModal";
+import FocusMode2 from "../components/FocusMode2";
 
 // ========== DASHBOARD COMPONENT ==========
 // Main page showing user's projects and tasks
@@ -17,6 +20,9 @@ export default function Dashboard({ token, logout }) {
   const [loading, setLoading] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
+  const [shareModal, setShareModal] = useState(null); // { projectId, projectTitle }
+  const [focusMode2Active, setFocusMode2Active] = useState(false);
+  const [selectedProjectForFocus, setSelectedProjectForFocus] = useState(null);
 
   // ========== MODAL STATES ==========
   // Controls visibility and content of project/task creation forms
@@ -32,6 +38,7 @@ export default function Dashboard({ token, logout }) {
     title: "",
     due_date: "",
     project_id: "",
+    tags: [], // Add tags to task form
   });
 
   // ========== API CALLS & DATA FETCHING ==========
@@ -388,12 +395,31 @@ export default function Dashboard({ token, logout }) {
                 >
                   <div className="flex justify-between items-start mb-6">
                     <h3 className="text-4xl font-black">{p.title}</h3>
-                    <button
-                      onClick={() => deleteProject(p.id)}
-                      className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
-                    >
-                      <Trash2 className="w-8 h-8" />
-                    </button>
+                    <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => setShareModal({ projectId: p.id, projectTitle: p.title })}
+                        className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg"
+                        title="Share project"
+                      >
+                        <Share2 className="w-6 h-6" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedProjectForFocus(p.id);
+                          setFocusMode2Active(true);
+                        }}
+                        className="text-purple-500 hover:text-purple-700 p-2 hover:bg-purple-50 rounded-lg"
+                        title="Focus Mode"
+                      >
+                        <Focus className="w-6 h-6" />
+                      </button>
+                      <button
+                        onClick={() => deleteProject(p.id)}
+                        className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg"
+                      >
+                        <Trash2 className="w-6 h-6" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xl text-gray-600 mb-10">
                     {p.description || "No description"}
@@ -542,6 +568,26 @@ export default function Dashboard({ token, logout }) {
       )}
       {/* AI CHAT PANEL */}
       <AIChatPanel token={token} isPremium={isPremium} />
+
+      {/* ========== SHARE MODAL ========== */}
+      {shareModal && (
+        <ShareModal
+          projectId={shareModal.projectId}
+          projectTitle={shareModal.projectTitle}
+          token={token}
+          onClose={() => setShareModal(null)}
+        />
+      )}
+
+      {/* ========== FOCUS MODE 2.0 ========== */}
+      {focusMode2Active && (
+        <FocusMode2
+          token={token}
+          projectId={selectedProjectForFocus}
+          onClose={() => setFocusMode2Active(false)}
+          onStreakUpdate={fetchData}
+        />
+      )}
     </div>
   );
 }

@@ -18,6 +18,8 @@ CREATE TABLE projects (
     deadline DATE,
     status VARCHAR(50) DEFAULT 'active',        -- active, completed, archived
     progress INTEGER DEFAULT 0 CHECK (progress BETWEEN 0 AND 100),
+    sharing_token VARCHAR(100) UNIQUE,          -- shareable link token
+    is_shared BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -29,6 +31,35 @@ CREATE TABLE tasks (
     description TEXT,
     due_date DATE,
     status VARCHAR(50) DEFAULT 'todo',          -- todo, in_progress, completed
+    tag VARCHAR(50),                             -- single tag per task for simplicity
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Tags Table
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    color VARCHAR(7) DEFAULT '#6366f1',         -- hex color for UI
+    UNIQUE(user_id, name)
+);
+
+-- Project Tags Junction Table
+CREATE TABLE project_tags (
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (project_id, tag_id)
+);
+
+-- Focus Sessions Table (for Focus Mode 2.0)
+CREATE TABLE focus_sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+    duration_minutes INTEGER NOT NULL,
+    tasks_completed INTEGER DEFAULT 0,
+    started_at TIMESTAMPTZ DEFAULT NOW(),
+    ended_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
