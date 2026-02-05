@@ -29,28 +29,45 @@ router.post('/projects', protect, async (req, res) => {
 // Protected route: creates task within project & validates ownership
 router.post('/tasks', protect, async (req, res) => {
   try {
-    const { project_id, title, due_date, tag } = req.body;
+    const { project_id, title, due_date, tag, difficulty } = req.body; // ✅ add difficulty
     const userId = req.user.userId;
+
+    // Validate difficulty
+    if (difficulty && !['easy', 'medium', 'hard'].includes(difficulty)) {
+      return res.status(400).json({ message: 'Invalid difficulty level' });
+    }
 
     const projectCheck = await pool.query(
       'SELECT id FROM projects WHERE id = $1 AND user_id = $2',
       [project_id, userId]
     );
+
     if (projectCheck.rows.length === 0) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
     const result = await pool.query(
-      `INSERT INTO tasks (project_id, title, due_date, tag, status) VALUES ($1, $2, $3, $4, 'todo') RETURNING *`,
-      [project_id, title, due_date || null, tag || null]
+      `INSERT INTO tasks 
+       (project_id, title, due_date, tag, difficulty, status) 
+       VALUES ($1, $2, $3, $4, $5, 'todo') 
+       RETURNING *`,
+      [
+        project_id,
+        title,
+        due_date || null,
+        tag || null,
+        difficulty || null // ✅ save difficulty
+      ]
     );
 
     res.status(201).json(result.rows[0]);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 // ========== TOGGLE TASK COMPLETION ==========
 // Protected route: toggles task status & auto-updates project progress

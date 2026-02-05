@@ -26,14 +26,16 @@ CREATE TABLE projects (
 -- Tasks Table
 CREATE TABLE tasks (
     id SERIAL PRIMARY KEY,
-    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    project_id INTEGER REFERENCES projects(id),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     due_date DATE,
-    status VARCHAR(50) DEFAULT 'todo',          -- todo, in_progress, completed
-    tag VARCHAR(50),                             -- single tag per task for simplicity
+    status VARCHAR(50) DEFAULT 'todo',
+    difficulty VARCHAR(20),
+    tag VARCHAR(50),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
 
 -- Tags Table
 CREATE TABLE tags (

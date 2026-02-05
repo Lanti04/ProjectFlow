@@ -175,6 +175,7 @@ export default function Dashboard({ token, logout }) {
           title: taskForm.title,
           due_date: taskForm.due_date || null,
           tag: tagString || null,
+          difficulty: taskForm.difficulty, 
         },
         {
           headers: { Authorization: `Bearer ${token}` },
