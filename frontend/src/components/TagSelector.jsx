@@ -7,9 +7,16 @@ import axios from 'axios';
 export default function TagSelector({ token, onTagsChange, initialTags = [] }) {
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState(initialTags);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(null);
   const [newTagName, setNewTagName] = useState('');
   const [newTagColor, setNewTagColor] = useState('#6366f1');
   const [showCreateTag, setShowCreateTag] = useState(false);
+
+  const difficultyOptions = [
+    { id: 'easy', name: 'Easy', color: '#10b981' },
+    { id: 'medium', name: 'Medium', color: '#f59e0b' },
+    { id: 'hard', name: 'Hard', color: '#ef4444' }
+  ];
 
   // Fetch all tags on mount
   useEffect(() => {
@@ -54,11 +61,9 @@ export default function TagSelector({ token, onTagsChange, initialTags = [] }) {
     );
   };
 
-  const difficultyTags = [
-    { name: 'Easy', color: '#10b981' },
-    { name: 'Medium', color: '#f59e0b' },
-    { name: 'Hard', color: '#ef4444' }
-  ];
+  const selectDifficulty = (diffId) => {
+    setSelectedDifficulty(selectedDifficulty === diffId ? null : diffId);
+  };
 
   return (
     <div className="space-y-4">
@@ -66,39 +71,26 @@ export default function TagSelector({ token, onTagsChange, initialTags = [] }) {
       <div>
         <label className="text-xs font-semibold text-gray-600 block mb-2">Difficulty:</label>
         <div className="flex gap-2">
-          {difficultyTags.map(difficulty => {
-            const isSelected = selectedTags.includes(difficulty.name);
-            return (
-              <button
-                key={difficulty.name}
-                onClick={() => {
-                  // Remove other difficulty tags first
-                  const filtered = selectedTags.filter(tag => 
-                    !difficultyTags.map(d => d.name).includes(tag)
-                  );
-                  // Toggle the selected difficulty
-                  if (isSelected) {
-                    setSelectedTags(filtered);
-                  } else {
-                    setSelectedTags([...filtered, difficulty.name]);
-                  }
-                }}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
-                  isSelected
-                    ? 'ring-2 ring-offset-1 scale-105'
-                    : 'opacity-60 hover:opacity-100'
-                }`}
-                style={{
-                  backgroundColor: difficulty.color + '20',
-                  color: difficulty.color,
-                  borderColor: difficulty.color,
-                  border: isSelected ? `2px solid ${difficulty.color}` : 'none'
-                }}
-              >
-                {difficulty.name}
-              </button>
-            );
-          })}
+          {difficultyOptions.map(difficulty => (
+            <button
+              key={difficulty.id}
+              type="button"
+              onClick={() => selectDifficulty(difficulty.id)}
+              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
+                selectedDifficulty === difficulty.id
+                  ? 'ring-2 ring-offset-1 scale-105'
+                  : 'opacity-60 hover:opacity-100'
+              }`}
+              style={{
+                backgroundColor: difficulty.color + '20',
+                color: difficulty.color,
+                borderColor: difficulty.color,
+                border: selectedDifficulty === difficulty.id ? `2px solid ${difficulty.color}` : 'none'
+              }}
+            >
+              {difficulty.name}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -109,6 +101,7 @@ export default function TagSelector({ token, onTagsChange, initialTags = [] }) {
           {tags.map(tag => (
             <button
               key={tag.id}
+              type="button"
               onClick={() => toggleTag(tag.id)}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
                 selectedTags.includes(tag.id)
@@ -129,6 +122,7 @@ export default function TagSelector({ token, onTagsChange, initialTags = [] }) {
         
         {!showCreateTag ? (
           <button
+            type="button"
             onClick={() => setShowCreateTag(true)}
             className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 mt-2"
           >
@@ -149,10 +143,10 @@ export default function TagSelector({ token, onTagsChange, initialTags = [] }) {
               onChange={(e) => setNewTagColor(e.target.value)}
               className="w-10 h-8 border rounded"
             />
-            <button onClick={createTag} className="text-xs bg-indigo-600 text-white px-2 py-1 rounded">
+            <button type="button" onClick={createTag} className="text-xs bg-indigo-600 text-white px-2 py-1 rounded">
               Create
             </button>
-            <button onClick={() => setShowCreateTag(false)} className="text-xs px-2">
+            <button type="button" onClick={() => setShowCreateTag(false)} className="text-xs px-2">
               <X className="w-4 h-4" />
             </button>
           </div>

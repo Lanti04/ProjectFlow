@@ -38,7 +38,8 @@ export default function Dashboard({ token, logout }) {
     title: "",
     due_date: "",
     project_id: "",
-    tags: [], // Add tags to task form
+    tags: [],
+    difficulty: null, // easy, medium, hard
   });
 
   // ========== API CALLS & DATA FETCHING ==========
@@ -161,19 +162,32 @@ export default function Dashboard({ token, logout }) {
   const handleTaskSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Build tag string including difficulty
+      let tagString = '';
+      if (taskForm.difficulty) {
+        tagString = taskForm.difficulty.charAt(0).toUpperCase() + taskForm.difficulty.slice(1);
+      }
+      
       await axios.post(
         "http://localhost:3001/api/tasks",
         {
           project_id: taskForm.project_id,
           title: taskForm.title,
           due_date: taskForm.due_date || null,
+          tag: tagString || null,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       setShowTaskModal(false);
-      setTaskForm({ title: "", due_date: "", project_id: "" });
+      setTaskForm({ 
+        title: "", 
+        due_date: "", 
+        project_id: "",
+        tags: [],
+        difficulty: null,
+      });
       fetchData();
     } catch (err) {
       alert("Failed to create task");
@@ -564,13 +578,40 @@ export default function Dashboard({ token, logout }) {
                 ))}
               </select>
               <div className="mb-6">
-                <TagSelector
-                  selectedTags={taskForm.tags}
-                  onTagsChange={(tags) =>
-                    setTaskForm({ ...taskForm, tags })
-                  }
-                  token={token}
-                />
+                <label className="text-xs font-semibold text-gray-600 block mb-2">Difficulty:</label>
+                <div className="flex gap-2 mb-4">
+                  {['easy', 'medium', 'hard'].map(diff => {
+                    const colors = {
+                      easy: '#10b981',
+                      medium: '#f59e0b',
+                      hard: '#ef4444'
+                    };
+                    const isSelected = taskForm.difficulty === diff;
+                    return (
+                      <button
+                        key={diff}
+                        type="button"
+                        onClick={() => setTaskForm({ 
+                          ...taskForm, 
+                          difficulty: isSelected ? null : diff 
+                        })}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
+                          isSelected
+                            ? 'ring-2 ring-offset-1 scale-105'
+                            : 'opacity-60 hover:opacity-100'
+                        }`}
+                        style={{
+                          backgroundColor: colors[diff] + '20',
+                          color: colors[diff],
+                          borderColor: colors[diff],
+                          border: isSelected ? `2px solid ${colors[diff]}` : 'none'
+                        }}
+                      >
+                        {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <input
                 type="date"
