@@ -337,20 +337,44 @@ export default function Dashboard({ token, logout }) {
                         >
                           {task.title}
                         </h3>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
                             {task.project_title}
                           </span>
+                          {task.tag && (
+                            <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                              {task.tag}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => deleteTask(task.id)}
-                      className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex-shrink-0"
-                      title="Delete task"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => setShareModal({ projectId: task.project_id, projectTitle: task.project_title })}
+                        className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg"
+                        title="Share project"
+                      >
+                        <Share2 className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedProjectForFocus(task.project_id);
+                          setFocusMode2Active(true);
+                        }}
+                        className="text-purple-500 hover:text-purple-700 p-2 hover:bg-purple-50 rounded-lg"
+                        title="Focus Mode"
+                      >
+                        <Focus className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                        title="Delete task"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -539,6 +563,15 @@ export default function Dashboard({ token, logout }) {
                   </option>
                 ))}
               </select>
+              <div className="mb-6">
+                <TagSelector
+                  selectedTags={taskForm.tags}
+                  onTagsChange={(tags) =>
+                    setTaskForm({ ...taskForm, tags })
+                  }
+                  token={token}
+                />
+              </div>
               <input
                 type="date"
                 value={taskForm.due_date}
