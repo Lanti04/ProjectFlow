@@ -32,9 +32,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ========== MIDDLEWARE SETUP ==========
-// CORS configuration - explicitly allow frontend origin
+// CORS configuration - explicitly allow frontend origins
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
