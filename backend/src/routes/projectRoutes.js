@@ -29,7 +29,7 @@ router.post('/projects', protect, async (req, res) => {
 // Protected route: creates task within project & validates ownership
 router.post('/tasks', protect, async (req, res) => {
   try {
-    const { project_id, title, due_date } = req.body;
+    const { project_id, title, due_date, tag } = req.body;
     const userId = req.user.userId;
 
     const projectCheck = await pool.query(
@@ -41,8 +41,8 @@ router.post('/tasks', protect, async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO tasks (project_id, title, due_date, status) VALUES ($1, $2, $3, 'todo') RETURNING *`,
-      [project_id, title, due_date || null]
+      `INSERT INTO tasks (project_id, title, due_date, tag, status) VALUES ($1, $2, $3, $4, 'todo') RETURNING *`,
+      [project_id, title, due_date || null, tag || null]
     );
 
     res.status(201).json(result.rows[0]);
