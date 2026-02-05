@@ -207,109 +207,168 @@ export default function Dashboard({ token, logout }) {
 
       <div className="ml-64 p-10">
         {/* ========== HEADER SECTION ========== */}
-        <div className="flex justify-between items-start mb-16">
-          {/* Left side — Welcome message */}
-          <div>
-            <h1 className="text-7xl font-black mb-4">Welcome back, Legend</h1>
-            <p className="text-3xl text-gray-700">
-              You have{" "}
-              <span className="font-bold text-indigo-600">
-                {todayTasks.length}
-              </span>{" "}
-              tasks today
-            </p>
-            <p className="text-3xl mt-4">
-              Total:{" "}
-              <span className="font-bold text-green-600">{completedTasks}</span>{" "}
-              / {totalTasks} completed
-            </p>
+        <div className="mb-16">
+          {/* Top Row: Welcome & Focus Mode */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-5xl font-black text-gray-900 mb-2">Welcome back, Legend! 🎉</h1>
+              <p className="text-xl text-gray-600">Let's make today productive</p>
+            </div>
+            
+            {/* Focus Mode Toggle Button */}
+            <button
+              onClick={() => setFocusMode(!focusMode)}
+              className={`px-6 py-3 rounded-xl font-bold text-white transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                focusMode
+                  ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+                  : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+              }`}
+              title={focusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+            >
+              {focusMode ? '🚀 Exit Focus' : '🎯 Focus Mode'}
+            </button>
           </div>
 
-          {/* Right side — Streak + Focus Mode (stacked vertically) */}
-          <div className="flex flex-col items-end gap-8">
-            {/* STREAK COUNTER */}
-            <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-6 rounded-3xl shadow-2xl text-center">
-              <p className="text-xl font-bold">Study Streak</p>
-              <p className="text-6xl font-black">
-                {data.user?.study_streak || 0} 🔥
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Streak Counter */}
+            <div className="bg-gradient-to-br from-orange-400 via-orange-500 to-red-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold opacity-90">Study Streak</span>
+                <span className="text-2xl">🔥</span>
+              </div>
+              <p className="text-4xl font-black">{data.user?.study_streak || 0}</p>
+              <p className="text-xs opacity-75 mt-2">Keep it going!</p>
+            </div>
+
+            {/* Today's Tasks */}
+            <div className="bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold opacity-90">Today's Tasks</span>
+                <span className="text-2xl">📋</span>
+              </div>
+              <p className="text-4xl font-black">{todayTasks.length}</p>
+              <p className="text-xs opacity-75 mt-2">Tasks to complete</p>
+            </div>
+
+            {/* Completed */}
+            <div className="bg-gradient-to-br from-green-400 to-green-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold opacity-90">Completed</span>
+                <span className="text-2xl">✅</span>
+              </div>
+              <p className="text-4xl font-black">{completedTasks}/{totalTasks}</p>
+              <p className="text-xs opacity-75 mt-2">
+                {totalTasks > 0
+                  ? `${Math.round((completedTasks / totalTasks) * 100)}% done`
+                  : 'No tasks yet'}
               </p>
             </div>
 
-            {/* FOCUS MODE BUTTON */}
-            <button
-              onClick={() => setFocusMode(!focusMode)}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-xl font-bold hover:scale-105 transition shadow-2xl"
-            >
-              {focusMode ? "Exit" : "Enter"} Focus Mode
-            </button>
+            {/* Projects */}
+            <div className="bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold opacity-90">Projects</span>
+                <span className="text-2xl">📁</span>
+              </div>
+              <p className="text-4xl font-black">{data.projects.length}</p>
+              <p className="text-xs opacity-75 mt-2">Active projects</p>
+            </div>
           </div>
         </div>
 
         {/* ========== TODAY'S TASKS SECTION ========== */}
         {/* High-priority: Tasks due TODAY with toggle & delete actions */}
-        <h2 className="text-5xl font-black mb-10">Today's Mission</h2>
+        <div className="mb-16">
+          <div className="mb-8">
+            <h2 className="text-4xl font-black text-gray-900 mb-2">Today's Mission</h2>
+            <p className="text-lg text-gray-600">Focus on what matters today 🎯</p>
+          </div>
+        </div>
         {/* All tasks completed state */}
         {todayTasks.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-2xl p-40 text-center">
-            <p className="text-9xl font-black text-green-600 mb-8">ALL DONE!</p>
-            <p className="text-5xl text-gray-700">Go touch grass</p>
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl shadow-xl p-20 text-center border-2 border-green-200">
+            <div className="mb-6">
+              <CheckCircle className="w-32 h-32 text-green-500 mx-auto" />
+            </div>
+            <p className="text-7xl font-black text-green-600 mb-4">ALL DONE!</p>
+            <p className="text-3xl text-gray-700">You've completed all your tasks for today. Great work!</p>
           </div>
         ) : (
-          <div className="space-y-10">
+          <div className="space-y-6">
             {/* Task cards with completion toggle & delete */}
             {todayTasks.map((task) => (
               <div
                 key={task.id}
-                className="bg-white rounded-3xl shadow-2xl p-10 hover:shadow-3xl transition"
+                className={`bg-white rounded-2xl shadow-lg border-2 hover:shadow-xl transition-all duration-300 overflow-hidden ${
+                  task.status === "completed" 
+                    ? "border-green-200 bg-green-50/30" 
+                    : "border-gray-200 hover:border-indigo-300"
+                }`}
               >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-6">
-                    <button onClick={() => toggleTask(task.id)}>
-                      {task.status === "completed" ? (
-                        <CheckCircle className="w-14 h-14 text-green-500" />
-                      ) : (
-                        <Circle className="w-14 h-14 text-gray-400 hover:text-indigo-600 transition" />
-                      )}
-                    </button>
-                    <div>
-                      <h3
-                        className={`text-3xl font-bold ${
-                          task.status === "completed"
-                            ? "line-through text-gray-400"
-                            : ""
-                        }`}
+                {/* Task Header */}
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4 flex-1">
+                      <button 
+                        onClick={() => toggleTask(task.id)}
+                        className="mt-1 flex-shrink-0 hover:scale-110 transition-transform duration-200"
                       >
-                        {task.title}
-
-                        <div className="mt-8">
-                          <FlashcardGenerator
-                            taskTitle={task.title}
-                            taskDescription={
-                              task.description || "No description"
-                            }
-                            token={token}
-                          />
+                        {task.status === "completed" ? (
+                          <CheckCircle className="w-7 h-7 text-green-500" />
+                        ) : (
+                          <Circle className="w-7 h-7 text-gray-400 hover:text-indigo-600 transition-colors" />
+                        )}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className={`text-xl font-bold mb-2 ${
+                            task.status === "completed"
+                              ? "line-through text-gray-400"
+                              : "text-gray-800"
+                          }`}
+                        >
+                          {task.title}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
+                            {task.project_title}
+                          </span>
                         </div>
-                      </h3>
-                      <p className="text-xl text-gray-600">
-                        {task.project_title}
-                      </p>
+                      </div>
                     </div>
+                    <button
+                      onClick={() => deleteTask(task.id)}
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex-shrink-0"
+                      title="Delete task"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => deleteTask(task.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="w-10 h-10" />
-                  </button>
                 </div>
 
-                {/* POMODORO TIMER — APPEARS UNDER EVERY TASK */}
-                <PomodoroTimer
-                  taskId={task.id}
-                  token={token}
-                  onComplete={() => toggleTask(task.id)}
-                />
+                {/* Content Section - Two Column Layout */}
+                <div className="p-6 grid grid-cols-2 gap-6">
+                  {/* Left Column: Flashcard Generator */}
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-100">
+                    <FlashcardGenerator
+                      taskTitle={task.title}
+                      taskDescription={
+                        task.description || "No description"
+                      }
+                      token={token}
+                    />
+                  </div>
+
+                  {/* Right Column: POMODORO TIMER */}
+                  <div>
+                    <PomodoroTimer
+                      taskId={task.id}
+                      token={token}
+                      onComplete={() => toggleTask(task.id)}
+                    />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -319,7 +378,7 @@ export default function Dashboard({ token, logout }) {
         {/*All projects in grid layout - hidden in focus mode */}
         {!focusMode && (
           <>
-            <h2 className="text-5xl font-black mt-32 mb-16">Your Empire</h2>
+            <h2 className="text-4xl font-black text-gray-900 mb-10">Your Empire</h2>
             {/* Project cards with progress bars */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
               {data.projects.map((p, i) => (

@@ -11,6 +11,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import calendarRoutes from './routes/calendarRoutes.js';
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -33,7 +34,9 @@ const corsOptions = {
   origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type'],
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 app.use(cors(corsOptions));
@@ -76,6 +79,9 @@ app.use('/api/user', userRoutes);
 
 // ========== PAYMENT ROUTES ==========
 app.use('/api/payment', paymentRoutes);
+
+// ========== CALENDAR FEED ==========
+app.use('/api', calendarRoutes);
 
 
 app.listen(PORT, () => {
