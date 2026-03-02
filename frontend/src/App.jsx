@@ -10,6 +10,7 @@ import SharedProjectPage from './pages/SharedProjectPage';
 import { useState } from 'react';
 import PricingPage from './pages/Pricingpage';
 import SuccessPage from './pages/SuccessPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 // ========== APP ROUTER & AUTH STATE ==========
 // Token stored in localStorage, protected routes redirect to login
@@ -35,6 +36,7 @@ function App() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/shared-project/:token" element={<SharedProjectPage />} />
+          <Route path="/analytics" element={token ? <AnalyticsPage token={token} logout={logout} /> : <Navigate to="/login" />} />
           <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

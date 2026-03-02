@@ -13,37 +13,62 @@ router.get('/dashboard', protect, async (req, res) => {
 
     // ===== Get user =====
     const userResult = await pool.query(
-      `SELECT id, name, email, study_streak, last_study_date, is_premium, plan_type 
+      `SELECT id, name, email, study_streak, last_study_date, is_premium, premium_expires_at 
        FROM users 
        WHERE id = $1`,
       [userId]
     );
 
-    // ===== Get projects =====
+    // ===== Get projects with NEW fields =====
     const projectsResult = await pool.query(
-      `SELECT id, title, description, deadline, status, progress, created_at 
-       FROM projects 
-       WHERE user_id = $1 AND deleted_at IS NULL
-       ORDER BY created_at DESC`,
+      `SELECT 
+         p.id, 
+         p.title, 
+         p.description, 
+         p.deadline, 
+         p.status, 
+         p.progress,
+         p.color,           -- NEW
+         p.emoji,           -- NEW
+         p.start_date,      -- NEW
+         p.priority,        -- NEW
+         p.created_at,
+         COUNT(t.id) as task_count,
+         COUNT(CASE WHEN t.status = 'completed' THEN 1 END) as completed_count
+       FROM projects p
+       LEFT JOIN tasks t ON t.project_id = p.id AND t.deleted_at IS NULL
+       WHERE p.user_id = $1 AND p.deleted_at IS NULL
+       GROUP BY p.id
+       ORDER BY p.created_at DESC`,
       [userId]
     );
 
-    // ===== Get tasks (WITH difficulty) =====
+    // ===== Get tasks with NEW fields =====
     const tasksResult = await pool.query(
       `SELECT 
           t.id,
           t.title,
+          t.description,        -- NEW
           t.due_date,
           t.status,
           t.project_id,
-          t.difficulty,          -- ✅ ADDED
-          p.title AS project_title
+          t.difficulty,
+          t.priority,           -- NEW
+          t.estimated_minutes,  -- NEW
+          t.actual_minutes,     -- NEW
+          t.tag,
+          p.title AS project_title,
+          p.color AS project_color,  -- NEW
+          p.emoji AS project_emoji   -- NEW
        FROM tasks t
        LEFT JOIN projects p ON t.project_id = p.id
        WHERE p.user_id = $1
          AND t.deleted_at IS NULL
          AND p.deleted_at IS NULL
-       ORDER BY t.due_date ASC NULLS LAST`,
+       ORDER BY 
+         CASE WHEN t.due_date = CURRENT_DATE THEN 0 ELSE 1 END,
+         t.priority DESC,
+         t.due_date ASC NULLS LAST`,
       [userId]
     );
 
@@ -66,24 +91,33 @@ router.get('/trash', protect, async (req, res) => {
 
     // ===== Get deleted projects =====
     const projectsResult = await pool.query(
-      `SELECT id, title, description, deadline, status, progress, created_at, deleted_at 
+      `SELECT 
+         id, title, description, deadline, status, progress, 
+         color, emoji, start_date, priority,
+         created_at, deleted_at 
        FROM projects 
        WHERE user_id = $1 AND deleted_at IS NOT NULL
        ORDER BY deleted_at DESC`,
       [userId]
     );
 
-    // ===== Get deleted tasks (WITH difficulty) =====
+    // ===== Get deleted tasks =====
     const tasksResult = await pool.query(
       `SELECT 
           t.id,
           t.title,
+          t.description,
           t.due_date,
           t.status,
           t.project_id,
-          t.difficulty,          -- ✅ ADDED
+          t.difficulty,
+          t.priority,
+          t.estimated_minutes,
+          t.tag,
           t.deleted_at,
-          p.title AS project_title
+          p.title AS project_title,
+          p.color AS project_color,
+          p.emoji AS project_emoji
        FROM tasks t
        LEFT JOIN projects p ON t.project_id = p.id
        WHERE p.user_id = $1

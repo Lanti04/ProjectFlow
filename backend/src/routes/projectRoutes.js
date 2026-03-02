@@ -10,15 +10,80 @@ const router = express.Router();
 // Protected route: inserts new project for authenticated user
 router.post('/projects', protect, async (req, res) => {
   try {
-    const { title, description, deadline } = req.body;
+    const { 
+      title, 
+      description, 
+      deadline,
+      color,           // NEW
+      emoji,           // NEW
+      start_date,      // NEW
+      priority         // NEW
+    } = req.body;
     const userId = req.user.userId;
 
     const result = await pool.query(
-      'INSERT INTO projects (user_id, title, description, deadline, progress) VALUES ($1, $2, $3, $4, 0) RETURNING *',
-      [userId, title, description || null, deadline || null]
+      `INSERT INTO projects (
+        user_id, title, description, deadline, progress, 
+        color, emoji, start_date, priority
+      ) VALUES ($1, $2, $3, $4, 0, $5, $6, $7, $8) 
+      RETURNING *`,
+      [
+        userId, 
+        title, 
+        description || null, 
+        deadline || null,
+        color || '#6366f1',
+        emoji || '📁',
+        start_date || null,
+        priority || 'medium'
+      ]
     );
 
     res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// ========== UPDATE PROJECT ==========
+// NEW: Protected route to update project details
+router.put('/projects/:id', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      title, 
+      description, 
+      deadline,
+      status,
+      color,
+      emoji,
+      start_date,
+      priority
+    } = req.body;
+    const userId = req.user.userId;
+
+    const result = await pool.query(
+      `UPDATE projects 
+       SET 
+         title = COALESCE($1, title),
+         description = COALESCE($2, description),
+         deadline = COALESCE($3, deadline),
+         status = COALESCE($4, status),
+         color = COALESCE($5, color),
+         emoji = COALESCE($6, emoji),
+         start_date = COALESCE($7, start_date),
+         priority = COALESCE($8, priority)
+       WHERE id = $9 AND user_id = $10
+       RETURNING *`,
+      [title, description, deadline, status, color, emoji, start_date, priority, id, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    res.json(result.rows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -29,12 +94,26 @@ router.post('/projects', protect, async (req, res) => {
 // Protected route: creates task within project & validates ownership
 router.post('/tasks', protect, async (req, res) => {
   try {
-    const { project_id, title, due_date, tag, difficulty } = req.body; // ✅ add difficulty
+    const { 
+      project_id, 
+      title, 
+      description,        // NEW
+      due_date, 
+      tag, 
+      difficulty,
+      priority,           // NEW
+      estimated_minutes   // NEW
+    } = req.body;
     const userId = req.user.userId;
 
     // Validate difficulty
     if (difficulty && !['easy', 'medium', 'hard'].includes(difficulty)) {
       return res.status(400).json({ message: 'Invalid difficulty level' });
+    }
+
+    // Validate priority
+    if (priority && !['low', 'medium', 'high', 'critical'].includes(priority)) {
+      return res.status(400).json({ message: 'Invalid priority level' });
     }
 
     const projectCheck = await pool.query(
@@ -48,15 +127,18 @@ router.post('/tasks', protect, async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO tasks 
-       (project_id, title, due_date, tag, difficulty, status) 
-       VALUES ($1, $2, $3, $4, $5, 'todo') 
+       (project_id, title, description, due_date, tag, difficulty, priority, estimated_minutes, status) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'todo') 
        RETURNING *`,
       [
         project_id,
         title,
+        description || null,
         due_date || null,
         tag || null,
-        difficulty || null // ✅ save difficulty
+        difficulty || null,
+        priority || 'medium',
+        estimated_minutes || null
       ]
     );
 
@@ -68,6 +150,50 @@ router.post('/tasks', protect, async (req, res) => {
   }
 });
 
+// ========== UPDATE TASK ==========
+// NEW: Protected route to update task details
+router.put('/tasks/:id', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      title, 
+      description, 
+      due_date, 
+      difficulty, 
+      priority,
+      estimated_minutes,
+      tag,
+      status
+    } = req.body;
+    const userId = req.user.userId;
+
+    const result = await pool.query(
+      `UPDATE tasks 
+       SET 
+         title = COALESCE($1, title),
+         description = COALESCE($2, description),
+         due_date = COALESCE($3, due_date),
+         difficulty = COALESCE($4, difficulty),
+         priority = COALESCE($5, priority),
+         estimated_minutes = COALESCE($6, estimated_minutes),
+         tag = COALESCE($7, tag),
+         status = COALESCE($8, status)
+       WHERE id = $9 
+         AND project_id IN (SELECT id FROM projects WHERE user_id = $10)
+       RETURNING *`,
+      [title, description, due_date, difficulty, priority, estimated_minutes, tag, status, id, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // ========== TOGGLE TASK COMPLETION ==========
 // Protected route: toggles task status & auto-updates project progress

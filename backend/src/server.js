@@ -15,6 +15,7 @@ import calendarRoutes from './routes/calendarRoutes.js';
 import tagsRoutes from './routes/tagsRoutes.js';
 import sharingRoutes from './routes/sharingRoutes.js';
 import focusRoutes from './routes/focusRoutes.js';
+import analyticRoutes from './routes/analyticRoutes.js';
 
 dotenv.config({ path: ".env" }); // ← THIS FORCES IT
 // DEBUG: Print exact values Node is seeing
@@ -57,6 +58,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api', dashboardRoutes);
 app.use('/api', projectRoutes);
 
+
+
 // ========== DATABASE CONNECTION ==========
 // Test connection to PostgreSQL pool
 pool
@@ -78,6 +81,9 @@ app.use('/api/ai', aiRoutes);
 
 // ========== USER ROUTES ==========
 app.use('/api/user', userRoutes);
+
+// ========== ANALYTIC ROUTES ==========
+app.use('/api/analytics', analyticRoutes);
 
 
 // ========== PAYMENT ROUTES ==========
