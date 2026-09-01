@@ -19,6 +19,7 @@ export default function ShareModal({ projectId, projectTitle, token, onClose }) 
       );
       setShareUrl(res.data.share_url);
     } catch (err) {
+      console.error('Failed to generate share link:', err);
       alert('Failed to generate share link');
     }
     setLoading(false);
@@ -45,6 +46,7 @@ export default function ShareModal({ projectId, projectTitle, token, onClose }) 
       setShareUrl('');
       alert('Share link revoked');
     } catch (err) {
+      console.error('Failed to revoke share link:', err);
       alert('Failed to revoke link');
     }
   };

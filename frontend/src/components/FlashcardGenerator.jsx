@@ -42,6 +42,7 @@ export default function FlashcardGenerator({
         setFlashcards([{ question: "Example Q", answer: "Example A" }]);
       }
     } catch (err) {
+      console.error('Flashcard generation error:', err);
       setFlashcards([{ question: "Study hard!", answer: "You've got this!" }]);
     } finally {
       setLoading(false);

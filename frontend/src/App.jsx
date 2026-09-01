@@ -8,7 +8,7 @@ import TrashPage from './pages/TrashPage';
 import CalendarPage from './pages/CalendarPage';
 import SharedProjectPage from './pages/SharedProjectPage';
 import { useState } from 'react';
-import PricingPage from './pages/Pricingpage';
+import PricingPage from './pages/PricingPage';
 import SuccessPage from './pages/SuccessPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 

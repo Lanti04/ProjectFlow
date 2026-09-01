@@ -25,7 +25,7 @@ export default function FocusMode2({ token, projectId, onClose, onStreakUpdate }
     if (timeLeft === 0 && sessionStarted) {
       completeSession();
     }
-  }, [timeLeft, sessionStarted]);
+  }, [timeLeft, sessionStarted, completeSession]);
 
   const startSession = async () => {
     try {
@@ -38,6 +38,7 @@ export default function FocusMode2({ token, projectId, onClose, onStreakUpdate }
       setIsRunning(true);
       setSessionStarted(true);
     } catch (err) {
+      console.error('Failed to start session:', err);
       alert('Failed to start session');
     }
   };
