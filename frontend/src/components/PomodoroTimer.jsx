@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Bell } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import axios from 'axios';
 
-export default function PomodoroTimer({ taskId, token, onComplete }) { 
+export default function PomodoroTimer({ onComplete }) { 
   const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);

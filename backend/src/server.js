@@ -5,7 +5,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js'
-import { Pool } from "pg";
 import { pool } from "./db.js";
 import projectRoutes from './routes/projectRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
@@ -16,16 +15,7 @@ import tagsRoutes from './routes/tagsRoutes.js';
 import sharingRoutes from './routes/sharingRoutes.js';
 import focusRoutes from './routes/focusRoutes.js';
 import analyticRoutes from './routes/analyticRoutes.js';
-
-dotenv.config({ path: ".env" }); // ← THIS FORCES IT
-// DEBUG: Print exact values Node is seeing
-console.log("=== ENV DEBUG ===");
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_PORT:", process.env.DB_PORT);
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_PASSWORD:", `"${process.env.DB_PASSWORD}"`); // quotes show spaces
-console.log("DB_NAME:", process.env.DB_NAME);
-console.log("=== END DEBUG ===");
+import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -100,6 +90,10 @@ app.use('/api/projects', sharingRoutes);
 
 // ========== FOCUS MODE 2.0 ROUTES ==========
 app.use('/api/focus', focusRoutes);
+
+// ========== ERROR HANDLING MIDDLEWARE ==========
+// Must be last - catches all errors
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

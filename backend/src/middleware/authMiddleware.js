@@ -1,6 +1,7 @@
 // ========== AUTHENTICATION MIDDLEWARE ==========
 // Protects routes by verifying JWT tokens from Authorization header
 import jwt from 'jsonwebtoken';
+import { ApiError } from './errorHandler.js';
 
 // ========== PROTECT MIDDLEWARE ==========
 // Extracts & validates JWT token, attaches userId to request
@@ -13,7 +14,7 @@ export const protect = async (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(401).json({ message: 'Not authorized, no token' });
+        throw new ApiError(401, 'Not authorized, no token');
     }
 
     try {
@@ -25,6 +26,12 @@ export const protect = async (req, res, next) => {
 
         next();  //we continue to troute
     } catch (error) {
-        return res.status(401).json({ message: 'Not authorized, token failed' });
+        if (error.name === 'TokenExpiredError') {
+            throw new ApiError(401, 'Token expired');
+        }
+        if (error.name === 'JsonWebTokenError') {
+            throw new ApiError(401, 'Invalid token');
+        }
+        throw error;
     }
 };
